@@ -15,7 +15,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: title,
       home: Scaffold(
-        appBar: AppBar(title: const Text(title)),
+        appBar: AppBar(
+          title: const Text(title),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.shopping_bag_outlined),
+              onPressed: () {
+                // ショップバッグアイコンが押されたときの処理
+              },
+            ),
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  // EndDrawerを開く
+                  Scaffold.of(context).openEndDrawer();
+                },
+              ),
+            ),
+          ],
+        ),
         endDrawer: Drawer(
           child: ListView(
             // Important: Remove any padding from the ListView.
