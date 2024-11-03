@@ -66,29 +66,28 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
-        body: GridView.count(
-            // Create a grid with 2 columns. If you change the scrollDirection to
-            // horizontal, this produces 2 rows.
-            shrinkWrap: true,
-            crossAxisCount: 2,
-            // Generate 100 widgets that display their index in the List.
-            children: [
-              ...destinations.map((destination) {
-                return Center(
-                  child: TravelDestinationItem(
-                    destination: destination,
-                  ),
-                );
-              }),
-              ...destinations.map((destination) {
-                return Center(
-                  child: TappableTravelDestinationItem(
-                    destination: destination,
-                  ),
-                );
-              }),
-            ]),
-      ),
-    );
+          body: Builder(builder: (context) {
+            final width = MediaQuery.of(context).size.width;
+
+            // 画面の幅に応じて列数を決定
+            int crossAxisCount;
+            if (width < 768) {
+              crossAxisCount = 1;
+            } else {
+              crossAxisCount = 3;
+            }
+
+            return GridView.count(
+                crossAxisCount: crossAxisCount, // 2列に指定
+                children: [
+                  ...destinations.map((destination) {
+                    return Center(
+                      child: TappableTravelDestinationItem(
+                        destination: destination,
+                      ),
+                    );
+                  }),
+                ]);
+          })),    );
   }
 }
