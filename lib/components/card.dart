@@ -31,6 +31,7 @@ const List<TravelDestination> destinations = [
     description: 'Number 10',
     city: 'Thanjavur',
     location: 'Thanjavur, Tamil Nadu',
+    cardType: CardType.tappable,
   ),
   TravelDestination(
     assetName: 'places/india_chettinad_silk_maker.png',
