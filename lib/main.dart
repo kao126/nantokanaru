@@ -15,57 +15,57 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: title,
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text(title),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.shopping_bag_outlined),
-              onPressed: () {
-                // ショップバッグアイコンが押されたときの処理
-              },
-            ),
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.menu),
+          appBar: AppBar(
+            title: const Text(title),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.shopping_bag_outlined),
                 onPressed: () {
-                  // EndDrawerを開く
-                  Scaffold.of(context).openEndDrawer();
+                  // ショップバッグアイコンが押されたときの処理
                 },
               ),
-            ),
-          ],
-        ),
-        endDrawer: Drawer(
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
+              Builder(
+                builder: (context) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () {
+                    // EndDrawerを開く
+                    Scaffold.of(context).openEndDrawer();
+                  },
                 ),
-                child: Text('Drawer Header'),
-              ),
-              ListTile(
-                title: const Text('About Us'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                  // Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('Log In'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                  // Navigator.pop(context);
-                },
               ),
             ],
           ),
-        ),
+          endDrawer: Drawer(
+            child: ListView(
+              // Important: Remove any padding from the ListView.
+              padding: EdgeInsets.zero,
+              children: [
+                const DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                  ),
+                  child: Text('Drawer Header'),
+                ),
+                ListTile(
+                  title: const Text('About Us'),
+                  onTap: () {
+                    // Update the state of the app.
+                    // ...
+                    // Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  title: const Text('Log In'),
+                  onTap: () {
+                    // Update the state of the app.
+                    // ...
+                    // Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
           body: Builder(builder: (context) {
             final width = MediaQuery.of(context).size.width;
 
@@ -88,6 +88,7 @@ class MyApp extends StatelessWidget {
                     );
                   }),
                 ]);
-          })),    );
+          })),
+    );
   }
 }
