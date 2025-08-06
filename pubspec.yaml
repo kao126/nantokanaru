@@ -40,6 +40,7 @@ dependencies:
   holiday_jp: ^0.0.8
   flutter_localizations:
     sdk: flutter
+  csv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
