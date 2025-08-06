@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:holiday_jp/holiday_jp.dart';
 
 Color _textColor(DateTime day) {
   const defaultTextColor = Colors.black87;
 
-  if (day.weekday == DateTime.sunday) {
+  if (day.weekday == DateTime.sunday || isHoliday(day)) {
     return Colors.red;
   }
   if (day.weekday == DateTime.saturday) {
@@ -14,19 +15,31 @@ Color _textColor(DateTime day) {
   return defaultTextColor;
 }
 
+bool isSameMonth(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month;
+}
+
 Widget _buildDayCell(DateTime day, Color bgColor, Color textColor) {
   return AnimatedContainer(
-    duration: const Duration(milliseconds: 250),
-    margin: const EdgeInsets.all(1.0),
-    decoration: BoxDecoration(
-      color: bgColor,
-    ),
-    alignment: Alignment.topCenter,
-    child: Text(
-      day.day.toString(),
-      style: TextStyle(color: textColor),
-    ),
-  );
+      duration: const Duration(milliseconds: 250),
+      margin: const EdgeInsets.all(1.0),
+      decoration: BoxDecoration(
+        color: bgColor,
+      ),
+      alignment: Alignment.topCenter,
+      child: Column(
+        children: [
+          Text(
+            '${day.day}',
+            style: TextStyle(color: textColor),
+          ),
+          if (isHoliday(day))
+            Text(
+              getHoliday(day)!.name, // 山の日など
+              style: TextStyle(fontSize: 10, color: textColor),
+            ),
+        ],
+      ));
 }
 
 class CalendarPage extends StatefulWidget {
@@ -57,20 +70,24 @@ class _CalendarPageState extends State<CalendarPage> {
           locale: 'ja_JP',
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           onDaySelected: (selectedDay, focusedDay) {
+            if (!isSameMonth(selectedDay, focusedDay)) return;
             setState(() {
               _selectedDay = selectedDay;
               _focusedDay = focusedDay;
             });
+          },
+          onPageChanged: (focusedDay) {
+            _focusedDay = focusedDay;
           },
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, day, focusedDay) {
               return _buildDayCell(day, Colors.white, _textColor(day));
             },
             todayBuilder: (context, day, focusedDay) {
-              return _buildDayCell(day, Colors.orangeAccent, Colors.white);
+              return _buildDayCell(day, Colors.orangeAccent, _textColor(day));
             },
             selectedBuilder: (context, day, focusedDay) {
-              return _buildDayCell(day, Colors.purple[100]!, Colors.white);
+              return _buildDayCell(day, Colors.purple[100]!, _textColor(day));
             },
             outsideBuilder: (context, day, focusedDay) {
               return _buildDayCell(
