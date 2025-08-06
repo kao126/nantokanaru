@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nantokanaru/components/calendar.dart';
+import 'package:nantokanaru/components/text-form.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,15 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: title,
       home: HomePage(),
+      //日本語表記のためのローカライズ設定
+      localizationsDelegates: [
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('ja'),
+      ],
     );
   }
 }
@@ -33,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[
-    Center(child: Text('入力')),
+    TextFormPage(),
     Center(child: Text('グラフ')),
     CalendarPage(),
     Center(child: Text('設定')),
