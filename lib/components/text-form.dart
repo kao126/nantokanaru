@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:nantokanaru/utils/csv_loader.dart';
+import 'package:nantokanaru/utils/csv_format.dart';
 
 class TextFormPage extends StatefulWidget {
   const TextFormPage({super.key});
@@ -9,11 +11,34 @@ class TextFormPage extends StatefulWidget {
 }
 
 class _TextFormPageState extends State<TextFormPage> {
-  final TextEditingController _dateController = TextEditingController();
   final TextEditingController _dayController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   int _choiceIndex = 0;
   DateTime _selectedDate = DateTime.now();
+  List<String> _csvData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _dayController.text =
+        "${_selectedDate.year}年${_selectedDate.month}月${_selectedDate.day}日";
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _dayController.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    final data = await loadCsvFromAssets('assets/data_j.csv');
+    final formattedData = formatNameAndCode(data);
+    setState(() {
+      _csvData = formattedData;
+    });
+  }
 
   void _showDatePicker(BuildContext context) {
     showModalBottomSheet(
@@ -21,33 +46,23 @@ class _TextFormPageState extends State<TextFormPage> {
       builder: (BuildContext builder) {
         return SizedBox(
           height: 250, // ボトムシートの高さを設定
-          child: Expanded(
-            child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date, // 日付モードに設定
-              initialDateTime: _selectedDate, // 初期日付
-              minimumDate: DateTime(1950, 1, 1), // 最小日付（1950年1月1日）
-              maximumDate: DateTime.now(), // 最大日付（今日の日付）
-              onDateTimeChanged: (DateTime newDate) {
-                // 日付変更時にテキストフィールドに反映
-                setState(() {
-                  _selectedDate = newDate;
-                  _dateController.text =
-                      "${newDate.year}年${newDate.month}月${newDate.day}日";
-                });
-              },
-            ),
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date, // 日付モードに設定
+            initialDateTime: _selectedDate, // 初期日付
+            minimumDate: DateTime(1950, 1, 1), // 最小日付（1950年1月1日）
+            maximumDate: DateTime.now(), // 最大日付（今日の日付）
+            onDateTimeChanged: (DateTime newDate) {
+              // 日付変更時にテキストフィールドに反映
+              setState(() {
+                _selectedDate = newDate;
+                _dayController.text =
+                    "${newDate.year}年${newDate.month}月${newDate.day}日";
+              });
+            },
           ),
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _dateController.dispose();
-    _dayController.dispose();
-    _amountController.dispose();
-    super.dispose();
   }
 
   @override
@@ -65,9 +80,10 @@ class _TextFormPageState extends State<TextFormPage> {
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
-              controller: _dateController,
+              controller: _dayController,
               readOnly: true, // タップでのみ日付選択可能
               decoration: const InputDecoration(
                 labelText: "日付",
@@ -78,13 +94,48 @@ class _TextFormPageState extends State<TextFormPage> {
               onTap: () => _showDatePicker(context),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: _dayController,
-              decoration: const InputDecoration(
-                hintText: '銘柄',
-                border: OutlineInputBorder(),
-              ),
-            ),
+            Autocomplete(fieldViewBuilder:
+                (context, textEditingController, focusNode, onFieldSubmitted) {
+              return TextFormField(
+                controller: textEditingController,
+                focusNode: focusNode,
+                decoration: const InputDecoration(
+                  hintText: '銘柄を検索',
+                  border: OutlineInputBorder(),
+                ),
+                onFieldSubmitted: (value) => onFieldSubmitted(),
+              );
+            }, optionsBuilder: (textEdigingValue) {
+              return _csvData
+                  .where((option) => option.contains(textEdigingValue.text));
+            }, optionsViewBuilder: (context, onSelected, options) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  padding:
+                      const EdgeInsets.only(right: 32.0), // ← 右側にPaddingを追加
+                  child: Material(
+                    elevation: 4.0,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final option = options.elementAt(index);
+                          return ListTile(
+                            title: Text(option),
+                            dense: true,
+                            onTap: () => onSelected(option),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
             const SizedBox(height: 10),
             TextField(
               controller: _amountController,
