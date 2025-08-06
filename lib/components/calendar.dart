@@ -57,7 +57,11 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar App'),
+        title: const Text('Calendar'),
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Padding(
@@ -66,7 +70,7 @@ class _CalendarPageState extends State<CalendarPage> {
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
           focusedDay: _focusedDay,
-          // shouldFillViewport: true,
+          shouldFillViewport: true,
           locale: 'ja_JP',
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           onDaySelected: (selectedDay, focusedDay) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-// import 'package:nantokanaru/components/card.dart';
 import 'package:nantokanaru/components/calendar.dart';
 
 void main() async {
@@ -14,86 +13,53 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const title = 'カレンダー';
+    const title = 'NantoKanaru';
 
-    return MaterialApp(
+    return const MaterialApp(
       title: title,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text(title),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.shopping_bag_outlined),
-              onPressed: () {
-                // ショップバッグアイコンが押されたときの処理
-              },
-            ),
-            Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {
-                  // EndDrawerを開く
-                  Scaffold.of(context).openEndDrawer();
-                },
-              ),
-            ),
-          ],
-        ),
-        endDrawer: Drawer(
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Text('Drawer Header'),
-              ),
-              ListTile(
-                title: const Text('About Us'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                  // Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('Log In'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                  // Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        ),
-        body: const CalendarPage(),
-        // body: Builder(builder: (context) {
-        //   final width = MediaQuery.of(context).size.width;
+      home: HomePage(),
+    );
+  }
+}
 
-        //   // 画面の幅に応じて列数を決定
-        //   int crossAxisCount;
-        //   if (width < 768) {
-        //     crossAxisCount = 1;
-        //   } else {
-        //     crossAxisCount = 3;
-        //   }
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-        //   return GridView.count(
-        //       crossAxisCount: crossAxisCount, // 2列に指定
-        //       children: [
-        //         ...destinations.map((destination) {
-        //           return Center(
-        //             child: TappableTravelDestinationItem(
-        //               destination: destination,
-        //             ),
-        //           );
-        //         }),
-        //       ]);
-        // })
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _pages = <Widget>[
+    Center(child: Text('入力')),
+    Center(child: Text('グラフ')),
+    CalendarPage(),
+    Center(child: Text('設定')),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index; // 選択中インデックスを更新
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.edit_document), label: '入力'),
+          BottomNavigationBarItem(icon: Icon(Icons.auto_graph), label: 'グラフ'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month), label: 'カレンダー'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
