@@ -41,7 +41,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   csv: ^6.0.0
-  fl_chart: ^0.71.0
+  fl_chart: ^0.66.1
 
 dev_dependencies:
   flutter_test:
