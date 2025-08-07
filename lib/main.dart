@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:nantokanaru/components/calendar.dart';
 import 'package:nantokanaru/components/text-form.dart';
+import 'package:nantokanaru/components/graph.dart';
+import 'package:nantokanaru/components/calendar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
 
   static const List<Widget> _pages = <Widget>[
     TextFormPage(),
-    Center(child: Text('グラフ')),
+    GraphPage(),
     CalendarPage(),
     Center(child: Text('設定')),
   ];
