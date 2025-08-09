@@ -14,12 +14,23 @@ class _GraphPageState extends State<GraphPage> {
   final TextEditingController _startMonthController = TextEditingController();
   final TextEditingController _endYearController = TextEditingController();
   final TextEditingController _endMonthController = TextEditingController();
-  final List<int> _years = List.generate(100, (index) => 2000 + index);
+  final List<int> _years =
+      List.generate(DateTime.now().year - 2000 + 1, (index) => 2000 + index);
   final List<int> _months = List.generate(12, (index) => index + 1);
   int _selectedStartYear = DateTime.now().year;
   int _selectedStartMonth = DateTime.now().month;
   int _selectedEndYear = DateTime.now().year;
   int _selectedEndMonth = DateTime.now().month;
+
+  final _datas = <int, List<double>>{
+    DateTime(2025, 8, 1).day: [1, 2, 3, 4],
+    DateTime(2025, 8, 2).day: [-1, -2, -3, -4],
+    DateTime(2025, 8, 3).day: [1.5, 2, 3.5, 6],
+    DateTime(2025, 8, 4).day: [1.5, 1.5, 4, 6.5],
+    DateTime(2025, 8, 5).day: [-2, -2, -5, -9],
+    DateTime(2025, 8, 6).day: [-1.2, -1.5, -4.3, -10],
+    DateTime(2025, 8, 7).day: [1.2, 4.8, 5, 5],
+  };
 
   @override
   void initState() {
@@ -49,35 +60,68 @@ class _GraphPageState extends State<GraphPage> {
       builder: (_) => Container(
         height: 250,
         color: Colors.white,
-        child: Column(
-          children: [
-            Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: CupertinoButton(
-                child: const Text("完了"),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-            Expanded(
-              child: CupertinoPicker(
-                scrollController: FixedExtentScrollController(
-                  initialItem: options.indexOf(selectedYear),
-                ),
-                itemExtent: 32.0,
-                onSelectedItemChanged: (int index) {
-                  setState(() {
-                    onDateChanged(options[index]);
-                  });
-                },
-                children: options
-                    .map((option) => Center(child: Text('$option')))
-                    .toList(),
-              ),
-            ),
-          ],
+        child: CupertinoPicker(
+          scrollController: FixedExtentScrollController(
+            initialItem: options.indexOf(selectedYear),
+          ),
+          itemExtent: 32.0,
+          onSelectedItemChanged: (int index) {
+            setState(() {
+              onDateChanged(options[index]);
+            });
+          },
+          children:
+              options.map((option) => Center(child: Text('$option'))).toList(),
         ),
       ),
+    );
+  }
+
+  Widget bottomTitles(double date, TitleMeta meta) {
+    return SideTitleWidget(
+      axisSide: AxisSide.bottom,
+      child: Text('$_selectedStartMonth/${date.toInt()}',
+          style: const TextStyle(color: Colors.black, fontSize: 10)),
+    );
+  }
+
+  Widget leftTitles(double value, TitleMeta meta) {
+    return SideTitleWidget(
+      axisSide: AxisSide.left,
+      space: 4,
+      child: Text(
+        value == 0 ? "0" : '${value.toInt()}',
+        style: const TextStyle(color: Colors.black, fontSize: 10),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  BarChartGroupData generateGroup(
+    int date,
+    double sum,
+  ) {
+    final isTop = sum > 0;
+    return BarChartGroupData(
+      x: date,
+      // groupVertically: true,
+      // showingTooltipIndicators: [],
+      barRods: [
+        BarChartRodData(
+          toY: sum,
+          width: 22,
+          color: Colors.amber,
+          borderRadius: isTop
+              ? const BorderRadius.only(
+                  topLeft: Radius.circular(6),
+                  topRight: Radius.circular(6),
+                )
+              : const BorderRadius.only(
+                  bottomLeft: Radius.circular(6),
+                  bottomRight: Radius.circular(6),
+                ),
+        ),
+      ],
     );
   }
 
@@ -190,28 +234,65 @@ class _GraphPageState extends State<GraphPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 30),
             SizedBox(
               height: 200, // 必要な高さを指定
-              child: PieChart(
-                PieChartData(
-                  sections: [
-                    PieChartSectionData(
-                      value: 10,
-                      color: Colors.white,
-                      radius: 40,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.center,
+                  groupsSpace: 12,
+                  titlesData: FlTitlesData(
+                    show: true,
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
-                    PieChartSectionData(
-                      value: 10,
-                      color: Colors.red,
-                      radius: 40,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        // reservedSize: 32,
+                        getTitlesWidget: bottomTitles,
+                      ),
                     ),
-                    PieChartSectionData(
-                      value: 10,
-                      color: Colors.green,
-                      radius: 40,
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: leftTitles,
+                        // interval: 5,
+                        // reservedSize: 42,
+                      ),
                     ),
-                  ],
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    checkToShowHorizontalLine: (value) => value % 5 == 0,
+                    getDrawingHorizontalLine: (value) {
+                      if (value == 0) {
+                        return const FlLine(
+                          color: Colors.orange,
+                          strokeWidth: 1.5,
+                        );
+                      }
+                      return const FlLine(
+                        color: Colors.amber,
+                        strokeWidth: 0.8,
+                      );
+                    },
+                  ),
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  barGroups: _datas.entries
+                      .map(
+                        (e) => generateGroup(
+                          e.key,
+                          e.value.reduce((a, b) => a + b),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
             ),
