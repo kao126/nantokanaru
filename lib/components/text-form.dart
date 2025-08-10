@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:nantokanaru/models/trade_record.dart';
+import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/utils/csv_loader.dart';
 import 'package:nantokanaru/utils/csv_format.dart';
 
@@ -21,6 +23,9 @@ class _TextFormPageState extends State<TextFormPage> {
   int _tabIndex = 0;
   DateTime _selectedDate = DateTime.now();
   List<String> _csvData = [];
+  String _selectedIssue = '';
+  String _selectedSymbol = '';
+  int _profitLoss = 0;
 
   @override
   void initState() {
@@ -36,6 +41,8 @@ class _TextFormPageState extends State<TextFormPage> {
 
       final number = int.tryParse(raw);
       if (number == null) return;
+
+      _profitLoss = number;
 
       final newText = _yenFormat.format(number);
 
@@ -90,6 +97,19 @@ class _TextFormPageState extends State<TextFormPage> {
         );
       },
     );
+  }
+
+  // 文字列から銘柄名とコードを分離
+  void _setIssueAndSymbol(String input) {
+    final regex = RegExp(r'^(.*)\((.*)\)$'); // "銘柄名(コード)"形式
+    final match = regex.firstMatch(input);
+    if (match != null) {
+      _selectedIssue = match.group(1) ?? '';
+      _selectedSymbol = match.group(2) ?? '';
+    } else {
+      _selectedIssue = input;
+      _selectedSymbol = '';
+    }
   }
 
   @override
@@ -163,7 +183,10 @@ class _TextFormPageState extends State<TextFormPage> {
                           labelText: '銘柄を検索',
                           border: OutlineInputBorder(),
                         ),
-                        onFieldSubmitted: (value) => onFieldSubmitted(),
+                        onFieldSubmitted: (value) => {
+                          _setIssueAndSymbol(value),
+                          onFieldSubmitted(),
+                        },
                       );
                     },
                     optionsBuilder: (textEdigingValue) {
@@ -189,7 +212,10 @@ class _TextFormPageState extends State<TextFormPage> {
                                   return ListTile(
                                     title: Text(option),
                                     dense: true,
-                                    onTap: () => onSelected(option),
+                                    onTap: () => {
+                                      _setIssueAndSymbol(option),
+                                      onSelected(option)
+                                    },
                                   );
                                 },
                               ),
@@ -274,6 +300,17 @@ class _TextFormPageState extends State<TextFormPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
+                      TradeRecord data = TradeRecord(
+                        date: _selectedDate,
+                        issue: _selectedIssue,
+                        symbol: _selectedSymbol,
+                        type: _chipIndex == 0 ? "margin" : "spot",
+                        profitLoss: _tabIndex == 0 ? -_profitLoss : _profitLoss,
+                        notes: null,
+                        createdAt: DateTime.now(),
+                        updatedAt: DateTime.now(),
+                      );
+                      DatabaseHelper.instance.insertData(data);
                       // 送信処理を書く
                       print('送信ボタンが押されました');
                     },
