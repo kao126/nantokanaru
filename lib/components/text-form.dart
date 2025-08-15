@@ -16,6 +16,7 @@ class TextFormPage extends StatefulWidget {
 
 class _TextFormPageState extends State<TextFormPage> {
   final TextEditingController _dayController = TextEditingController();
+  late TextEditingController _issueAndSymbolController;
   final TextEditingController _amountController = TextEditingController();
   final NumberFormat _yenFormat =
       NumberFormat.currency(locale: 'ja_JP', symbol: '¥', decimalDigits: 0);
@@ -176,6 +177,7 @@ class _TextFormPageState extends State<TextFormPage> {
                   Autocomplete(
                     fieldViewBuilder: (context, textEditingController,
                         focusNode, onFieldSubmitted) {
+                      _issueAndSymbolController = textEditingController;
                       return TextFormField(
                         controller: textEditingController,
                         focusNode: focusNode,
@@ -311,8 +313,18 @@ class _TextFormPageState extends State<TextFormPage> {
                         updatedAt: DateTime.now(),
                       );
                       DatabaseHelper.instance.insertData(data);
-                      // 送信処理を書く
-                      print('送信ボタンが押されました');
+
+                      // フォームの入力内容を初期化
+                      _issueAndSymbolController.clear();
+                      _amountController.clear();
+
+                      // SnackBar表示
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('データを登録しました'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
                     },
                     child: Text(_tabIndex == 0 ? '支出を入力する' : '収入を入力する'),
                   ),
