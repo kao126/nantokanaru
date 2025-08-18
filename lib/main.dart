@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:nantokanaru/components/text-form.dart';
 import 'package:nantokanaru/components/graph.dart';
 import 'package:nantokanaru/components/calendar.dart';
+import 'package:nantokanaru/components/setting.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
     TextFormPage(),
     GraphPage(),
     CalendarPage(),
-    Center(child: Text('設定')),
+    SettingPage(),
   ];
 
   void _onItemTapped(int index) {
