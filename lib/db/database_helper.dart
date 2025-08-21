@@ -51,6 +51,13 @@ class DatabaseHelper {
     );
   }
 
+  Future<List<String>> getTableColumns(String tableName) async {
+    final db = await database;
+    final result = await db.rawQuery('PRAGMA table_info($tableName)'); // SQLiteのPRAGMAでテーブル情報を取得
+    final columns = result.map((row) => row['name'] as String).toList(); // カラム名を抽出
+    return columns;
+  }
+
   Future<List<TradeRecord>> getDatas() async {
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('trade_records');
