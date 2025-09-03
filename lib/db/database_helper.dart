@@ -98,4 +98,18 @@ class DatabaseHelper {
       );
     });
   }
+
+  Future<void> clearTradeRecords(String tableName) async {
+    final db = await database;
+    await db.delete(tableName);
+  }
+
+  // Future<void> resetDatabase() async {
+  //   final dbPath = join(await getDatabasesPath(), "nantokanaru.db");
+  //   if (_database != null) {
+  //     await _database!.close();
+  //     _database = null;
+  //   }
+  //   await deleteDatabase(dbPath);
+  // }
 }

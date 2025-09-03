@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nantokanaru/components/csv.dart';
+import 'package:nantokanaru/db/database_helper.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -31,6 +32,13 @@ class _SettingPageState extends State<SettingPage> {
                   builder: (context) => const CsvPage(),
                 ),
               );
+            },
+          ),
+          ListTile(
+            title: const Text("データ全削除"),
+            trailing: const Icon(Icons.delete_forever),
+            onTap: () async {
+              await DatabaseHelper.instance.clearTradeRecords("trade_records");
             },
           ),
           SwitchListTile(
