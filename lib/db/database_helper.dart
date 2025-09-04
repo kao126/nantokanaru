@@ -99,6 +99,29 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<TradeRecord>> getDayData(int year, int month, int day) async {
+    final Database db = await database;
+    final yearMonthDay = '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}'; // 年-月-日
+    final List<Map<String, dynamic>> maps = await db.query(
+      'trade_records',
+      where: 'date LIKE ?',
+      whereArgs: ['$yearMonthDay%'],
+    );
+    return List.generate(maps.length, (i) {
+      return TradeRecord(
+        id: maps[i]['id'],
+        date: DateTime.parse(maps[i]['date']),
+        issue: maps[i]['issue'],
+        symbol: maps[i]['symbol'],
+        type: maps[i]['type'],
+        profitLoss: maps[i]['profit_loss'],
+        notes: maps[i]['notes'],
+        createdAt: DateTime.parse(maps[i]['created_at']),
+        updatedAt: DateTime.parse(maps[i]['updated_at']),
+      );
+    });
+  }
+
   Future<void> clearTradeRecords(String tableName) async {
     final db = await database;
     await db.delete(tableName);

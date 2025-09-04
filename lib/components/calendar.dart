@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
+import 'package:nantokanaru/components/day.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:holiday_jp/holiday_jp.dart';
 
@@ -121,7 +122,7 @@ class _CalendarPageState extends State<CalendarPage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: TableCalendar(
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
@@ -129,12 +130,20 @@ class _CalendarPageState extends State<CalendarPage> {
           shouldFillViewport: true,
           locale: 'ja_JP',
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          onDaySelected: (selectedDay, focusedDay) {
+          onDaySelected: (selectedDay, focusedDay) async {
             if (!isSameMonth(selectedDay, focusedDay)) return;
-            setState(() {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay;
-            });
+            if (isSameDay(_selectedDay, selectedDay)) {
+              await Navigator.of(context).push<ThemeMode>(
+                MaterialPageRoute(
+                  builder: (context) => DayPage(selectedDay: selectedDay),
+                ),
+              );
+            } else {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            }
           },
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
