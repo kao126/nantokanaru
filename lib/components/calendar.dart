@@ -4,6 +4,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:holiday_jp/holiday_jp.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
+import 'package:nantokanaru/widgets/custom_app_bar.dart';
+import 'package:nantokanaru/widgets/custom_container.dart';
 import 'package:nantokanaru/components/day.dart';
 
 Color _textColor(DateTime day) {
@@ -113,16 +115,10 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Calendar'),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      appBar: const CustomAppBar(
+        title: 'Calendar',
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
+      body: CustomContainer(
         child: TableCalendar(
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
