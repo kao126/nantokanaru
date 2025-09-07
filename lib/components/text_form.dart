@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
 import 'package:nantokanaru/widgets/custom_app_bar.dart';
+import 'package:nantokanaru/widgets/custom_container.dart';
 import 'package:nantokanaru/utils/csv_loader.dart';
 import 'package:nantokanaru/utils/csv_format.dart';
 
@@ -148,7 +149,7 @@ class _TextFormPageState extends State<TextFormPage> {
               },
             ),
           ),
-          body: Container(
+          body: CustomContainer(
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
