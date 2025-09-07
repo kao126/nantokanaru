@@ -24,7 +24,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       flexibleSpace: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFB4A582),
+          color: const Color(0xFFB4A582), // RIKYUSHIRACHA
           image: DecorationImage(
             image: const AssetImage("assets/img/texture.png"),
             fit: BoxFit.cover,
