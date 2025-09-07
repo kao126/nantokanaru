@@ -17,6 +17,7 @@ class TextFormPage extends StatefulWidget {
 }
 
 class _TextFormPageState extends State<TextFormPage> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _dayController = TextEditingController();
   late TextEditingController _issueAndSymbolController;
   final TextEditingController _amountController = TextEditingController();
@@ -154,222 +155,246 @@ class _TextFormPageState extends State<TextFormPage> {
             height: double.infinity,
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextFormField(
-                    controller: _dayController,
-                    readOnly: true, // タップでのみ日付選択可能
-                    decoration: const InputDecoration(
-                      labelText: "日付",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        borderSide: BorderSide.none,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _dayController,
+                      readOnly: true, // タップでのみ日付選択可能
+                      decoration: const InputDecoration(
+                        labelText: "日付",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
+                      // フィールドがタップされた時に日付ピッカーを表示
+                      onTap: () => _showDatePicker(context),
                     ),
-                    // フィールドがタップされた時に日付ピッカーを表示
-                    onTap: () => _showDatePicker(context),
-                  ),
-                  const SizedBox(height: 10),
-                  Autocomplete(
-                    fieldViewBuilder: (context, textEditingController,
-                        focusNode, onFieldSubmitted) {
-                      _issueAndSymbolController = textEditingController;
-                      return TextFormField(
-                        controller: textEditingController,
-                        focusNode: focusNode,
-                        decoration: const InputDecoration(
-                          labelText: '銘柄を検索',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
+                    const SizedBox(height: 10),
+                    Autocomplete(
+                      fieldViewBuilder: (context, textEditingController,
+                          focusNode, onFieldSubmitted) {
+                        _issueAndSymbolController = textEditingController;
+                        return TextFormField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            labelText: '銘柄を検索',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          onFieldSubmitted: (value) => {
+                            _setIssueAndSymbol(value),
+                            onFieldSubmitted(),
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "銘柄を選択してください";
+                            }
+                            return null;
+                          },
+                        );
+                      },
+                      optionsBuilder: (textEdigingValue) {
+                        return _csvData.where(
+                            (option) => option.contains(textEdigingValue.text));
+                      },
+                      optionsViewBuilder: (context, onSelected, options) {
+                        return Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 32.0),
+                            child: Material(
+                              elevation: 4.0,
+                              child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxHeight: 200),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.zero,
+                                  itemCount: options.length,
+                                  itemBuilder: (context, index) {
+                                    final option = options.elementAt(index);
+                                    return ListTile(
+                                      title: Text(option),
+                                      tileColor: Colors.white,
+                                      dense: true,
+                                      onTap: () => {
+                                        _setIssueAndSymbol(option),
+                                        onSelected(option)
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: _amountController,
+                      decoration: const InputDecoration(
+                        labelText: '金額',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            _profitLoss == 0) {
+                          return "金額を入力してください";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 10,
+                      children: [
+                        ChoiceChip(
+                          label: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Transform.rotate(
+                                angle: 0.785398, // 45度
+                                child: Icon(
+                                  Icons.push_pin,
+                                  size: 24,
+                                  color: _chipIndex == 0
+                                      ? const Color(0xffc3b491)
+                                      : const Color(0xffc3b491)
+                                          .withOpacity(0.6),
+                                ),
+                              ),
+                              Text(
+                                "株式投資(信用)",
+                                style: TextStyle(
+                                  color: _chipIndex == 0
+                                      ? Colors.black87
+                                      : Colors.grey[400],
+                                ),
+                              ),
+                            ],
+                          ),
+                          labelStyle: const TextStyle(fontSize: 10),
+                          selected: _chipIndex == 0,
+                          side: _chipIndex == 0
+                              ? const BorderSide(color: Color(0xFFB4A582))
+                              : const BorderSide(color: Colors.transparent),
+                          backgroundColor: Colors.white,
+                          selectedColor: Colors.white,
+                          showCheckmark: false,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              _chipIndex = 0;
+                            });
+                          },
+                        ),
+                        ChoiceChip(
+                          label: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Transform.rotate(
+                                angle: 0.785398, // 45度
+                                child: Icon(
+                                  Icons.push_pin,
+                                  size: 24,
+                                  color: _chipIndex == 1
+                                      ? const Color(0xff676767)
+                                      : const Color(0xff676767)
+                                          .withOpacity(0.4),
+                                ),
+                              ),
+                              Text(
+                                "株式投資(現物)",
+                                style: TextStyle(
+                                  color: _chipIndex == 1
+                                      ? Colors.black87
+                                      : Colors.grey[400],
+                                ),
+                              ),
+                            ],
+                          ),
+                          labelStyle: const TextStyle(fontSize: 10),
+                          selected: _chipIndex == 1,
+                          side: _chipIndex == 1
+                              ? const BorderSide(color: Color(0xFFB4A582))
+                              : const BorderSide(color: Colors.transparent),
+                          backgroundColor: Colors.white,
+                          selectedColor: Colors.white,
+                          showCheckmark: false,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              _chipIndex = 1;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: const ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.white),
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(8.0)),
-                            borderSide: BorderSide.none,
                           ),
                         ),
-                        onFieldSubmitted: (value) => {
-                          _setIssueAndSymbol(value),
-                          onFieldSubmitted(),
-                        },
-                      );
-                    },
-                    optionsBuilder: (textEdigingValue) {
-                      return _csvData.where(
-                          (option) => option.contains(textEdigingValue.text));
-                    },
-                    optionsViewBuilder: (context, onSelected, options) {
-                      return Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          padding: const EdgeInsets.only(right: 32.0),
-                          child: Material(
-                            elevation: 4.0,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxHeight: 200),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                padding: EdgeInsets.zero,
-                                itemCount: options.length,
-                                itemBuilder: (context, index) {
-                                  final option = options.elementAt(index);
-                                  return ListTile(
-                                    title: Text(option),
-                                    tileColor: Colors.white,
-                                    dense: true,
-                                    onTap: () => {
-                                      _setIssueAndSymbol(option),
-                                      onSelected(option)
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    controller: _amountController,
-                    decoration: const InputDecoration(
-                      labelText: '金額',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        borderSide: BorderSide.none,
                       ),
-                    ),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 10,
-                    children: [
-                      ChoiceChip(
-                        label: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Transform.rotate(
-                              angle: 0.785398, // 45度
-                              child: Icon(
-                                Icons.push_pin,
-                                size: 24,
-                                color: _chipIndex == 0
-                                    ? const Color(0xffc3b491)
-                                    : const Color(0xffc3b491).withOpacity(0.6),
-                              ),
-                            ),
-                            Text(
-                              "株式投資(信用)",
-                              style: TextStyle(
-                                color: _chipIndex == 0
-                                    ? Colors.black87
-                                    : Colors.grey[400],
-                              ),
-                            ),
-                          ],
-                        ),
-                        labelStyle: const TextStyle(fontSize: 10),
-                        selected: _chipIndex == 0,
-                        side: _chipIndex == 0
-                            ? const BorderSide(color: Color(0xFFB4A582))
-                            : const BorderSide(color: Colors.transparent),
-                        backgroundColor: Colors.white,
-                        selectedColor: Colors.white,
-                        showCheckmark: false,
-                        onSelected: (bool selected) {
-                          setState(() {
-                            _chipIndex = 0;
-                          });
-                        },
-                      ),
-                      ChoiceChip(
-                        label: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Transform.rotate(
-                              angle: 0.785398, // 45度
-                              child: Icon(
-                                Icons.push_pin,
-                                size: 24,
-                                color: _chipIndex == 1
-                                    ? const Color(0xff676767)
-                                    : const Color(0xff676767).withOpacity(0.4),
-                              ),
-                            ),
-                            Text(
-                              "株式投資(現物)",
-                              style: TextStyle(
-                                color: _chipIndex == 1
-                                    ? Colors.black87
-                                    : Colors.grey[400],
-                              ),
-                            ),
-                          ],
-                        ),
-                        labelStyle: const TextStyle(fontSize: 10),
-                        selected: _chipIndex == 1,
-                        side: _chipIndex == 1
-                            ? const BorderSide(color: Color(0xFFB4A582))
-                            : const BorderSide(color: Colors.transparent),
-                        backgroundColor: Colors.white,
-                        selectedColor: Colors.white,
-                        showCheckmark: false,
-                        onSelected: (bool selected) {
-                          setState(() {
-                            _chipIndex = 1;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: const ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.white),
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      TradeRecord data = TradeRecord(
-                        date: _selectedDate,
-                        issue: _selectedIssue,
-                        symbol: _selectedSymbol,
-                        type: _chipIndex == 0 ? "margin" : "spot",
-                        profitLoss: _tabIndex == 0 ? -_profitLoss : _profitLoss,
-                        notes: null,
-                        createdAt: DateTime.now(),
-                        updatedAt: DateTime.now(),
-                      );
-                      DatabaseHelper.instance.insertData(data);
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          TradeRecord data = TradeRecord(
+                            date: _selectedDate,
+                            issue: _selectedIssue,
+                            symbol: _selectedSymbol,
+                            type: _chipIndex == 0 ? "margin" : "spot",
+                            profitLoss:
+                                _tabIndex == 0 ? -_profitLoss : _profitLoss,
+                            notes: null,
+                            createdAt: DateTime.now(),
+                            updatedAt: DateTime.now(),
+                          );
+                          DatabaseHelper.instance.insertData(data);
 
-                      // フォームの入力内容を初期化
-                      _issueAndSymbolController.clear();
-                      _amountController.clear();
+                          // フォームの入力内容を初期化
+                          _issueAndSymbolController.clear();
+                          _amountController.clear();
 
-                      // SnackBar表示
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('データを登録しました'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      _tabIndex == 0 ? '支出を入力する' : '収入を入力する',
-                      style: const TextStyle(color: Colors.black87),
+                          // SnackBar表示
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('データを登録しました'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        _tabIndex == 0 ? '支出を入力する' : '収入を入力する',
+                        style: const TextStyle(color: Colors.black87),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
