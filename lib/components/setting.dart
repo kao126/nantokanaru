@@ -34,13 +34,13 @@ class _SettingPageState extends State<SettingPage> {
               );
             },
           ),
-          ListTile(
-            title: const Text("データ全削除"),
-            trailing: const Icon(Icons.delete_forever),
-            onTap: () async {
-              await DatabaseHelper.instance.clearTradeRecords("trade_records");
-            },
-          ),
+          // ListTile(
+          //   title: const Text("データ全削除"),
+          //   trailing: const Icon(Icons.delete_forever),
+          //   onTap: () async {
+          //     await DatabaseHelper.instance.clearTradeRecords("trade_records");
+          //   },
+          // ),
           SwitchListTile(
             title: const Text("通知を有効にする"),
             value: true,
