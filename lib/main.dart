@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:nantokanaru/components/text-form.dart';
+import 'package:nantokanaru/components/text_form.dart';
 import 'package:nantokanaru/components/graph.dart';
 import 'package:nantokanaru/components/calendar.dart';
 import 'package:nantokanaru/components/setting.dart';
