@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class CustomContainer extends StatelessWidget {
   final Widget child;
+  final double? width;
   final double? height;
   final EdgeInsetsGeometry padding;
 
   const CustomContainer({
     super.key,
     required this.child,
+    this.width,
     this.height,
     this.padding = const EdgeInsets.all(8.0),
   });
@@ -15,6 +17,7 @@ class CustomContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: width,
       height: height,
       padding: padding,
       decoration: BoxDecoration(

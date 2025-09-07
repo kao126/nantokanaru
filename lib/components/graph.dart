@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
 import 'package:nantokanaru/widgets/custom_app_bar.dart';
+import 'package:nantokanaru/widgets/custom_container.dart';
 
 class GraphPage extends StatefulWidget {
   const GraphPage({super.key});
@@ -202,7 +203,7 @@ class _GraphPageState extends State<GraphPage> {
       appBar: const CustomAppBar(
         title: "Graph",
       ),
-      body: Container(
+      body: CustomContainer(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
         child: Column(
