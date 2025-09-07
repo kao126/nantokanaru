@@ -42,14 +42,42 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+class NavigationItem {
+  final String label;
+  final Icon icon;
+  final Widget page;
+
+  const NavigationItem({
+    required this.label,
+    required this.icon,
+    required this.page,
+  });
+}
+
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
-    TextFormPage(),
-    GraphPage(),
-    CalendarPage(),
-    SettingPage(),
+  static const List<NavigationItem> _items = [
+    NavigationItem(
+      label: "入力",
+      icon: Icon(Icons.edit_document),
+      page: TextFormPage(),
+    ),
+    NavigationItem(
+      label: "グラフ",
+      icon: Icon(Icons.auto_graph),
+      page: GraphPage(),
+    ),
+    NavigationItem(
+      label: "カレンダー",
+      icon: Icon(Icons.calendar_month),
+      page: CalendarPage(),
+    ),
+    NavigationItem(
+      label: "設定",
+      icon: Icon(Icons.settings),
+      page: SettingPage(),
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -61,16 +89,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: _items[_selectedIndex].page,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.edit_document), label: '入力'),
-          BottomNavigationBarItem(icon: Icon(Icons.auto_graph), label: 'グラフ'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month), label: 'カレンダー'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
-        ],
+        items: _items
+            .map(
+              (item) =>
+                  BottomNavigationBarItem(icon: item.icon, label: item.label),
+            )
+            .toList(),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
