@@ -18,7 +18,7 @@ class CustomContainer extends StatelessWidget {
       height: height,
       padding: padding,
       decoration: BoxDecoration(
-        color: const Color(0xFFFCFAF2),
+        color: const Color(0xFFFCFAF2), // SHIRONERI
         image: DecorationImage(
           image: const AssetImage("assets/img/texture.png"),
           fit: BoxFit.cover,

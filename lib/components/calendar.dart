@@ -85,31 +85,31 @@ class _CalendarPageState extends State<CalendarPage> {
     final profitLossArr =
         _aggregateRecords(_tradeRecords)[localDayAtMidnight] ?? const <int>[];
     final total = profitLossArr.fold<int>(0, (s, v) => s + v);
-    return AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        margin: const EdgeInsets.all(1.0),
-        decoration: BoxDecoration(
-          color: bgColor,
-        ),
-        alignment: Alignment.topCenter,
-        child: Column(
-          children: [
+    return Container(
+      margin: const EdgeInsets.all(1.0),
+      decoration: BoxDecoration(
+        color: bgColor,
+      ),
+      alignment: Alignment.topCenter,
+      child: Column(
+        children: [
+          Text(
+            '${day.day}',
+            style: TextStyle(color: textColor),
+          ),
+          if (isHoliday(day))
             Text(
-              '${day.day}',
-              style: TextStyle(color: textColor),
+              getHoliday(day)!.name,
+              style: TextStyle(fontSize: 8, color: textColor),
             ),
-            if (isHoliday(day))
-              Text(
-                getHoliday(day)!.name,
-                style: TextStyle(fontSize: 8, color: textColor),
-              ),
-            if (profitLossArr.isNotEmpty)
-              Text(
-                _numberFormat.format(total),
-                style: TextStyle(fontSize: 8, color: Colors.grey[600]),
-              ),
-          ],
-        ));
+          if (profitLossArr.isNotEmpty)
+            Text(
+              _numberFormat.format(total),
+              style: TextStyle(fontSize: 8, color: Colors.grey[600]),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -119,6 +119,7 @@ class _CalendarPageState extends State<CalendarPage> {
         title: 'Calendar',
       ),
       body: CustomContainer(
+        height: 550,
         child: TableCalendar(
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
@@ -150,30 +151,34 @@ class _CalendarPageState extends State<CalendarPage> {
               return _buildDayCell(day, Colors.white, _textColor(day));
             },
             todayBuilder: (context, day, focusedDay) {
-              return _buildDayCell(day, Colors.orangeAccent, _textColor(day));
+              return _buildDayCell(day, Colors.white, _textColor(day));
             },
             selectedBuilder: (context, day, focusedDay) {
-              return _buildDayCell(day, Colors.purple[100]!, _textColor(day));
+              return _buildDayCell(
+                day,
+                const Color(0xFFFAD689), // USUKI
+                _textColor(day),
+              );
             },
             outsideBuilder: (context, day, focusedDay) {
               return _buildDayCell(
-                  day, Colors.grey[100]!, Colors.grey[500]!); // 例：薄い色で表示
+                  day, Colors.grey[100]!, Colors.grey[500]!);
             },
             dowBuilder: (context, day) {
               return Text(
                 DateFormat.E('ja_JP').format(day),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: _textColor(day)),
+                style: TextStyle(
+                  color: _textColor(day),
+                  fontSize: 12,
+                ),
               );
             },
           ),
           headerStyle: const HeaderStyle(
             formatButtonVisible: false,
             titleCentered: true,
-          ),
-          daysOfWeekStyle: const DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: Colors.black), // 月〜金
-            weekendStyle: TextStyle(color: Colors.red),
+            headerPadding: EdgeInsets.zero,
           ),
         ),
       ),
