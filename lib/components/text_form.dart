@@ -151,6 +151,7 @@ class _TextFormPageState extends State<TextFormPage> {
           ),
           body: CustomContainer(
             width: double.infinity,
+            height: double.infinity,
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
@@ -161,8 +162,12 @@ class _TextFormPageState extends State<TextFormPage> {
                     readOnly: true, // タップでのみ日付選択可能
                     decoration: const InputDecoration(
                       labelText: "日付",
+                      filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     // フィールドがタップされた時に日付ピッカーを表示
                     onTap: () => _showDatePicker(context),
@@ -177,7 +182,13 @@ class _TextFormPageState extends State<TextFormPage> {
                         focusNode: focusNode,
                         decoration: const InputDecoration(
                           labelText: '銘柄を検索',
-                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                         onFieldSubmitted: (value) => {
                           _setIssueAndSymbol(value),
@@ -193,8 +204,7 @@ class _TextFormPageState extends State<TextFormPage> {
                       return Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          padding: const EdgeInsets.only(
-                              right: 32.0), // ← 右側にPaddingを追加
+                          padding: const EdgeInsets.only(right: 32.0),
                           child: Material(
                             elevation: 4.0,
                             child: ConstrainedBox(
@@ -207,6 +217,7 @@ class _TextFormPageState extends State<TextFormPage> {
                                   final option = options.elementAt(index);
                                   return ListTile(
                                     title: Text(option),
+                                    tileColor: Colors.white,
                                     dense: true,
                                     onTap: () => {
                                       _setIssueAndSymbol(option),
@@ -226,7 +237,12 @@ class _TextFormPageState extends State<TextFormPage> {
                     controller: _amountController,
                     decoration: const InputDecoration(
                       labelText: '金額',
-                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -241,19 +257,29 @@ class _TextFormPageState extends State<TextFormPage> {
                           children: [
                             Transform.rotate(
                               angle: 0.785398, // 45度
-                              child: const Icon(Icons.push_pin,
-                                  size: 24, color: Color(0xffc3b491)),
+                              child: Icon(
+                                Icons.push_pin,
+                                size: 24,
+                                color: _chipIndex == 0
+                                    ? const Color(0xffc3b491)
+                                    : const Color(0xffc3b491).withOpacity(0.6),
+                              ),
                             ),
-                            const Text("株式投資(信用)"),
+                            Text(
+                              "株式投資(信用)",
+                              style: TextStyle(
+                                color: _chipIndex == 0
+                                    ? Colors.black87
+                                    : Colors.grey[400],
+                              ),
+                            ),
                           ],
                         ),
                         labelStyle: const TextStyle(fontSize: 10),
                         selected: _chipIndex == 0,
                         side: _chipIndex == 0
-                            ? const BorderSide(
-                                color: Colors.black87, width: 0.5)
-                            : const BorderSide(
-                                color: Colors.transparent, width: 0.5),
+                            ? const BorderSide(color: Color(0xFFB4A582))
+                            : const BorderSide(color: Colors.transparent),
                         backgroundColor: Colors.white,
                         selectedColor: Colors.white,
                         showCheckmark: false,
@@ -269,19 +295,29 @@ class _TextFormPageState extends State<TextFormPage> {
                           children: [
                             Transform.rotate(
                               angle: 0.785398, // 45度
-                              child: const Icon(Icons.push_pin,
-                                  size: 24, color: Color(0xff676767)),
+                              child: Icon(
+                                Icons.push_pin,
+                                size: 24,
+                                color: _chipIndex == 1
+                                    ? const Color(0xff676767)
+                                    : const Color(0xff676767).withOpacity(0.4),
+                              ),
                             ),
-                            const Text("株式投資(現物)"),
+                            Text(
+                              "株式投資(現物)",
+                              style: TextStyle(
+                                color: _chipIndex == 1
+                                    ? Colors.black87
+                                    : Colors.grey[400],
+                              ),
+                            ),
                           ],
                         ),
                         labelStyle: const TextStyle(fontSize: 10),
                         selected: _chipIndex == 1,
                         side: _chipIndex == 1
-                            ? const BorderSide(
-                                color: Colors.black87, width: 0.5)
-                            : const BorderSide(
-                                color: Colors.transparent, width: 0.5),
+                            ? const BorderSide(color: Color(0xFFB4A582))
+                            : const BorderSide(color: Colors.transparent),
                         backgroundColor: Colors.white,
                         selectedColor: Colors.white,
                         showCheckmark: false,
@@ -295,6 +331,14 @@ class _TextFormPageState extends State<TextFormPage> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                    style: const ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.white),
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        ),
+                      ),
+                    ),
                     onPressed: () {
                       TradeRecord data = TradeRecord(
                         date: _selectedDate,
@@ -320,7 +364,10 @@ class _TextFormPageState extends State<TextFormPage> {
                         ),
                       );
                     },
-                    child: Text(_tabIndex == 0 ? '支出を入力する' : '収入を入力する'),
+                    child: Text(
+                      _tabIndex == 0 ? '支出を入力する' : '収入を入力する',
+                      style: const TextStyle(color: Colors.black87),
+                    ),
                   ),
                 ],
               ),
