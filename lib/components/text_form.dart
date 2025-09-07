@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:nantokanaru/models/trade_record.dart';
 import 'package:nantokanaru/db/database_helper.dart';
+import 'package:nantokanaru/models/trade_record.dart';
+import 'package:nantokanaru/widgets/custom_app_bar.dart';
 import 'package:nantokanaru/utils/csv_loader.dart';
 import 'package:nantokanaru/utils/csv_format.dart';
 
@@ -123,16 +124,8 @@ class _TextFormPageState extends State<TextFormPage> {
           FocusScope.of(context).unfocus(); // ← フォーカスを外す
         },
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Text Form'),
-            centerTitle: true,
-            titleTextStyle: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-            backgroundColor: _tabIndex == 0
-                // ? Theme.of(context).colorScheme.primary
-                ? Colors.red[300]
-                : Colors.blue[300],
+          appBar: CustomAppBar(
+            title: 'Text Form',
             bottom: TabBar(
               // controller: tabController,
               tabs: const <Widget>[

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nantokanaru/components/csv.dart';
-import 'package:nantokanaru/db/database_helper.dart';
+// import 'package:nantokanaru/db/database_helper.dart';
+import 'package:nantokanaru/widgets/custom_app_bar.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -13,13 +14,8 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("setting"),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      appBar: const CustomAppBar(
+        title: "setting",
       ),
       body: ListView(
         children: [
