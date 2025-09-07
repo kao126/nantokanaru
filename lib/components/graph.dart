@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
+import 'package:nantokanaru/widgets/custom_app_bar.dart';
 
 class GraphPage extends StatefulWidget {
   const GraphPage({super.key});
@@ -198,13 +199,8 @@ class _GraphPageState extends State<GraphPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Graph"),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      appBar: const CustomAppBar(
+        title: "Graph",
       ),
       body: Container(
         width: double.infinity,

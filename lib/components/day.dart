@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
-import 'package:nantokanaru/models/trade_record.dart';
 import 'package:nantokanaru/db/database_helper.dart';
+import 'package:nantokanaru/models/trade_record.dart';
+import 'package:nantokanaru/widgets/custom_app_bar.dart';
 
 // Segmented control tabs
 enum DaySegment { income, expense }
@@ -49,14 +50,9 @@ class _DayPageState extends State<DayPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-            "${_selectedDay.year}年${_selectedDay.month}月${_selectedDay.day}日(${DateFormat.E('ja_JP').format(_selectedDay)})"),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      appBar: CustomAppBar(
+        title:
+            "${_selectedDay.year}年${_selectedDay.month}月${_selectedDay.day}日(${DateFormat.E('ja_JP').format(_selectedDay)})",
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(20),
           child: Padding(
