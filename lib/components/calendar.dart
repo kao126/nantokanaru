@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:holiday_jp/holiday_jp.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
 import 'package:nantokanaru/components/day.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:holiday_jp/holiday_jp.dart';
 
 Color _textColor(DateTime day) {
   const defaultTextColor = Colors.black87;
