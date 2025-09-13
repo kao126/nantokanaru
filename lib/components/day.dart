@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:nantokanaru/db/database_helper.dart';
 import 'package:nantokanaru/models/trade_record.dart';
 import 'package:nantokanaru/widgets/custom_app_bar.dart';
+import 'package:nantokanaru/widgets/custom_container.dart';
+import 'package:nantokanaru/widgets/day_list_view.dart';
 
 // Segmented control tabs
 enum DaySegment { income, expense }
@@ -21,7 +23,6 @@ class _DayPageState extends State<DayPage> {
   late DateTime _selectedDay;
   late List<TradeRecord> _profitRecords;
   late List<TradeRecord> _lossRecords;
-  final NumberFormat _numberFormat = NumberFormat('#,###');
   DaySegment _segment = DaySegment.income;
 
   @override
@@ -80,31 +81,11 @@ class _DayPageState extends State<DayPage> {
           ),
         ),
       ),
-      body: _segment == DaySegment.income
-          ? (_profitRecords.isNotEmpty
-              ? ListView(
-                  children: _profitRecords
-                      .map((tradeRecord) => ListTile(
-                            title: Text(tradeRecord.issue),
-                            subtitle: Text(tradeRecord.symbol),
-                            trailing: Text(
-                                "${_numberFormat.format(tradeRecord.profitLoss)}円"),
-                          ))
-                      .toList(),
-                )
-              : const Center(child: Text("データがありません")))
-          : (_lossRecords.isNotEmpty
-              ? ListView(
-                  children: _lossRecords
-                      .map((tradeRecord) => ListTile(
-                            title: Text(tradeRecord.issue),
-                            subtitle: Text(tradeRecord.symbol),
-                            trailing: Text(
-                                "${_numberFormat.format(tradeRecord.profitLoss)}円"),
-                          ))
-                      .toList(),
-                )
-              : const Center(child: Text("データがありません"))),
+      body: CustomContainer(
+        child: _segment == DaySegment.income
+            ? DayListView(records: _profitRecords)
+            : DayListView(records: _lossRecords),
+      ),
     );
   }
 }
