@@ -38,13 +38,15 @@ class _DayPageState extends State<DayPage> {
   Future<void> _fetchTradeRecords() async {
     List<TradeRecord> tradeRecords = await DatabaseHelper.instance
         .getDayData(_selectedDay.year, _selectedDay.month, _selectedDay.day);
+    final profitRecords = tradeRecords
+        .where((tradeRecord) => tradeRecord.profitLoss > 0)
+        .toList();
+    final lossRecords = tradeRecords
+        .where((tradeRecord) => tradeRecord.profitLoss < 0)
+        .toList();
     setState(() {
-      _profitRecords = tradeRecords
-          .where((tradeRecord) => tradeRecord.profitLoss > 0)
-          .toList();
-      _lossRecords = tradeRecords
-          .where((tradeRecord) => tradeRecord.profitLoss < 0)
-          .toList();
+      _profitRecords = profitRecords;
+      _lossRecords = lossRecords;
     });
   }
 
