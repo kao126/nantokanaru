@@ -16,6 +16,7 @@ class GraphPage extends StatefulWidget {
 
 class _GraphPageState extends State<GraphPage> {
   late List<TradeRecord> _tradeRecords;
+  late double _maxYValue;
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _monthController = TextEditingController();
   final List<int> _years =
@@ -30,6 +31,7 @@ class _GraphPageState extends State<GraphPage> {
   void initState() {
     super.initState();
     _tradeRecords = [];
+    _maxYValue = 0;
     _fetchTradeRecords();
     _yearController.text = "$_selectedYear";
     _monthController.text = "$_selectedMonth";
@@ -46,8 +48,25 @@ class _GraphPageState extends State<GraphPage> {
   Future<void> _fetchTradeRecords() async {
     List<TradeRecord> tradeRecords = await DatabaseHelper.instance
         .getMonthData(_selectedYear, _selectedMonth);
+
+    final dailyTotals = _aggregateRecords(tradeRecords)
+        .entries
+        .where((e) => e.value.isNotEmpty)
+        .map((e) => e.value.reduce((a, b) => a + b))
+        .toList();
+
+    final maxAbsValue = dailyTotals.reduce((a, b) => a.abs() > b.abs() ? a : b);
+
+    double maxYValue = (maxAbsValue.abs() / 10000).ceil() * 10000;
+
+    // 3で割り切れるまで10000ずつ増やす
+    while (maxYValue % 3 != 0) {
+      maxYValue += 10000;
+    }
+
     setState(() {
       _tradeRecords = tradeRecords;
+      _maxYValue = maxYValue;
     });
   }
 
@@ -167,7 +186,9 @@ class _GraphPageState extends State<GraphPage> {
       axisSide: AxisSide.left,
       space: 4,
       child: Text(
-        value == 0 ? "0" : '${value.toInt()}',
+        (value == meta.max || value == meta.min)
+            ? ""
+            : value.toInt().toString(),
         style: const TextStyle(color: Colors.black, fontSize: 10),
         textAlign: TextAlign.center,
       ),
@@ -259,9 +280,11 @@ class _GraphPageState extends State<GraphPage> {
             ),
             const SizedBox(height: 30),
             SizedBox(
-              height: 200, // 必要な高さを指定
+              height: 300, // 必要な高さを指定
               child: BarChart(
                 BarChartData(
+                  maxY: _maxYValue + 1,
+                  minY: -_maxYValue - 1,
                   alignment: BarChartAlignment.center,
                   groupsSpace: 12,
                   titlesData: FlTitlesData(
@@ -280,6 +303,7 @@ class _GraphPageState extends State<GraphPage> {
                         showTitles: true,
                         getTitlesWidget: leftTitles,
                         reservedSize: 50,
+                        interval: _maxYValue / 3 == 0 ? 1 : _maxYValue / 3,
                       ),
                     ),
                     rightTitles: const AxisTitles(
@@ -308,7 +332,9 @@ class _GraphPageState extends State<GraphPage> {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    checkToShowHorizontalLine: (value) => value % 5 == 0,
+                    horizontalInterval:
+                        _maxYValue / 3 == 0 ? 1 : _maxYValue / 3,
+                    checkToShowHorizontalLine: (value) => value % 5000 == 0,
                     getDrawingHorizontalLine: (value) {
                       if (value == 0) {
                         return const FlLine(
